@@ -16,8 +16,11 @@ class GrantService:
         """Check if a grant is currently active."""
         if grant.revoked_at is not None:
             return False
-        now = datetime.now(timezone.utc)
-        return grant.expires_at > now
+        expires_at = grant.expires_at
+        if expires_at.tzinfo is not None:
+            expires_at = expires_at.astimezone(timezone.utc).replace(tzinfo=None)
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        return expires_at > now
 
     @staticmethod
     def validate_expiry(expires_at: datetime) -> None:

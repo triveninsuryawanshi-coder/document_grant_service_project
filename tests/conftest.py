@@ -6,9 +6,16 @@ from uuid import uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.types import UUID
 
 from app.main import app, get_session
 from app.models import Base, User, Document, Grant
+
+
+@compiles(UUID, "sqlite")
+def compile_uuid_sqlite(type_, compiler, **kw):
+    return "CHAR(32)"
 
 
 # Use in-memory SQLite for faster tests
